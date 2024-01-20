@@ -36,22 +36,24 @@ const Rodape = styled.footer`
     align-items: center;
 `
 
-const Imagem = ({ foto, expandida = false }) => {
-    return (<Figure $expandida={expandida} id={`foto-${foto.id}`}>
-        <img src={foto.path} alt={foto.alt} />
-        <figcaption>
-            <h3>{foto.titulo}</h3>
-            <Rodape>
-                <h4>{foto.fonte}</h4>
-                <BotaoIcone>
-                    <img src="/icones/favorite_outline.png" alt="Icone de favorito" />
-                </BotaoIcone>
-                {!expandida && <BotaoIcone aria-hidden={expandida}>
-                    <img src="/icones/open_in_full.png" alt="Icone de expandir" />
-                </BotaoIcone>}
-            </Rodape>
-        </figcaption>
-    </Figure>)
+const Imagem = ({ foto = [], expandida = false, aoZoomSolicitado  }) => {
+    return (
+        <Figure $expandida={expandida} id={`foto-${foto.id}`}>
+            <img src={foto.path} alt={foto.alt} />
+            <figcaption>
+                <h3>{foto.titulo}</h3>
+                <Rodape>
+                    <h4>{foto.fonte}</h4>
+                    <BotaoIcone>
+                        <img src="/icones/favorite_outline.png" alt="Icone de favorito" />
+                    </BotaoIcone>
+                    {!expandida && <BotaoIcone aria-hidden={expandida} onClick={()=> aoZoomSolicitado(foto)}>
+                        <img src="/icones/open_in_full.png" alt="Icone de expandir" />
+                    </BotaoIcone>}
+                </Rodape>
+            </figcaption>
+        </Figure>
+    )
 }
 
 export default Imagem
