@@ -4,9 +4,9 @@ import Cabecalho from './components/Header'
 import CampoTexto from './components/CampoTexto'
 import BarraLateral from './components/BarraLateral'
 import Banner from './components/Banner'
-import bannerImage from './assets/banner.png' 
+import bannerImage from './assets/banner.png'
 import Galeria from './components/Galeria'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import fotos from './fotos.json'
 import ModalZoom from './components/ModalZoom'
 
@@ -35,34 +35,65 @@ const ConteudoGaleria = styled.section`
 function App() {
   const [fotosDaGaleria, setFotosDaGaleria] = useState(fotos);
   const [fotoSelecionada, setFotoSelecionada] = useState(null);
+  const [filtro, setFiltro] = useState('')
+  const [tag, setTag] = useState(0)
+  const [fotoComZoom, setFotoComZoom] = useState(null)
   
+  function aoAlternarFavorito(foto) {
+
+    if (foto.id === fotoSelecionada?.id){
+      setFotoSelecionada({
+        ...fotoSelecionada,
+        favorita: !fotoSelecionada.favorita
+      })
+    }
+    setFotosDaGaleria(fotosDaGaleria.map(fotoGaleria => {
+      return {
+        ...fotoGaleria,
+        favorita: fotoGaleria.id === foto.id ? !foto.favorita : fotoGaleria.favorita
+      }
+    }))
+  }
+
+  useEffect(() => {
+    const fotosFiltradas = fotos.filter(foto => {
+      const filtroPorTag = !tag || foto.tagId === tag;
+      const filtroPorTitulo = !filtro || foto.titulo.toLowerCase().includes(filtro.toLowerCase());
+      return filtroPorTag && filtroPorTitulo;
+    })
+    setFotosDaGaleria(fotosFiltradas)
+  }, [filtro, tag])
+
   return (
     <FundoGradiente>
       <GlobalStyles />
       <AppContainer>
 
         <Cabecalho>
-          <CampoTexto type="search"/>
+          <CampoTexto type="search" onChange={(evento) => { setFiltro(evento.target.value) }}/>
         </Cabecalho>
         <MainContainer>
           <BarraLateral />
           <ConteudoGaleria>
-          
-            <Banner 
+
+            <Banner
               texto="A galeria mais completa de fotos do espaço!"
               backgroundImage={bannerImage}
             />
-            <Galeria 
+            <Galeria
               fotos={fotosDaGaleria}
-              aoFotoSelecionada={ foto => setFotoSelecionada(foto)}
+              aoFotoSelecionada={foto => setFotoSelecionada(foto)}
+              aoAlternarFavorito={aoAlternarFavorito}
+              setTag={setTag}
             />
           </ConteudoGaleria>
         </MainContainer>
       </AppContainer>
 
-      <ModalZoom 
+      <ModalZoom
         foto={fotoSelecionada}
-        aoFechar={()=> setFotoSelecionada(null)}
+        aoFechar={() => setFotoSelecionada(null)}
+        aoAlternarFavorito={aoAlternarFavorito}
       />
     </FundoGradiente>
   )
